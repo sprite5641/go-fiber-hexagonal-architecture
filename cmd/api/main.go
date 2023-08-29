@@ -1,7 +1,8 @@
+// cmd/api/main.go
 package main
 
-import "fmt"
+import "go-hexagonal/internal/infrastructure/adapter/http/fiber"
 
 func main() {
-	fmt.Println("Hello ")
+	fiber.StartServer()
 }
