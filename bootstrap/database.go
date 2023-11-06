@@ -7,6 +7,8 @@ import (
 	"log"
 	"time"
 
+	_ "github.com/GoogleCloudPlatform/cloudsql-proxy/proxy/dialers/postgres"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -70,31 +72,31 @@ func CloseMongoDBConnection(client mongo.Client) {
 
 func NewPostgresDatabase(env *Env) *gorm.DB {
 	var dsn string
+	var gormDialector gorm.Dialector
 
 	if env.RunEnv == "local" {
 		dsn = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable TimeZone=Asia/Bangkok", env.DBHost, env.DBPort, env.DBUser, env.DBPass, env.DBName)
-	} else {
-		instanceConnName := env.InstanceConnectionName
-		dbUser := env.DBUser
-		dbName := env.DBName
-		dbPass := env.DBPass
-		var dbURI string
 
-		if env.RunEnv == "cloud-dev" {
-			dbURI = fmt.Sprintf("postgres://%s:%s@/%s?host=/cloudsql/%s", dbUser, dbPass, dbName, instanceConnName)
-		} else if env.RunEnv == "cloud-prod" {
-			dbURI = fmt.Sprintf("host=/cloudsql/%s user=%s dbname=%s password=%s sslmode=disable TimeZone=Asia/Bangkok", instanceConnName, dbUser, dbName, env.DBPass)
+		gormDialector = postgres.Open(dsn)
+	} else {
+		if env.RunEnv == "cloud-dev" || env.RunEnv == "cloud-prod" {
+			dsn = fmt.Sprintf("host=/cloudsql/%s user=%s dbname=%s password=%s sslmode=disable TimeZone=Asia/Bangkok", env.InstanceConnectionName, env.DBUser, env.DBName, env.DBPass)
 		} else {
 			log.Fatalf("Unknown RUN_ENV: %s", env.RunEnv)
 		}
 
-		dsn = dbURI
+		gormDialector = postgres.New(postgres.Config{
+			DriverName:           "cloudsqlpostgres",
+			DSN:                  dsn,
+			PreferSimpleProtocol: true,
+		})
 	}
-	fmt.Println("dsn", dsn)
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+
+	db, err := gorm.Open(gormDialector, &gorm.Config{
 		Logger: SqlLogger{logger.Default.LogMode(logger.Info)},
 		DryRun: false,
 	})
+
 	if err != nil {
 		log.Fatalf("Failed to connect to Postgres: %v", err)
 	}
