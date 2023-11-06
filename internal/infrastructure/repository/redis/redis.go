@@ -7,6 +7,8 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+var ctx = context.Background()
+
 type RedisClient struct {
 	client *redis.Client
 }
@@ -21,16 +23,16 @@ func NewRedisClient(addr string, password string, db int) *RedisClient {
 	}
 }
 
-func (r *RedisClient) SetKey(ctx context.Context, key string, value string) error {
+func (r *RedisClient) SetKey(key string, value string) error {
 	_, err := r.client.Set(ctx, key, value, 0).Result()
 	return err
 }
 
-func (r *RedisClient) GetKey(ctx context.Context, key string) (string, error) {
+func (r *RedisClient) GetKey(key string) (string, error) {
 	return r.client.Get(ctx, key).Result()
 }
 
-func (r *RedisClient) DeleteKey(ctx context.Context, key string) error {
+func (r *RedisClient) DeleteKey(key string) error {
 	return r.client.Del(ctx, key).Err()
 }
 
@@ -42,7 +44,7 @@ func (r *RedisClient) Ping(ctx context.Context) error {
 	return r.client.Ping(ctx).Err()
 }
 
-func (r *RedisClient) SetKeyWithExpire(ctx context.Context, key string, value string, expiration time.Duration) error {
+func (r *RedisClient) SetKeyWithExpire(key string, value string, expiration time.Duration) error {
 	_, err := r.client.Set(ctx, key, value, expiration).Result()
 	return err
 }
