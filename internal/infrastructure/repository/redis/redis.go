@@ -7,8 +7,6 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-// var ctx = context.Background()
-
 type RedisClient struct {
 	client *redis.Client
 }

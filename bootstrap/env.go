@@ -24,6 +24,7 @@ type Env struct {
 	RedisHost              string `mapstructure:"REDIS_HOST"`
 	RedisPassword          string `mapstructure:"REDIS_PASSWORD"`
 	RedisDB                int    `mapstructure:"REDIS_DB"`
+	AppName                string `mapstructure:"APP_NAME"`
 }
 
 func NewEnv() *Env {

@@ -3,6 +3,7 @@ package fiber
 import (
 	"fmt"
 	"go-hexagonal/bootstrap"
+	"go-hexagonal/config"
 	"go-hexagonal/pkg/middleware"
 	"log"
 	"os"
@@ -11,7 +12,6 @@ import (
 
 	"go-hexagonal/internal/infrastructure/adapter/http/fiber/router"
 
-	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -19,14 +19,7 @@ func StartServer() {
 	appInit := bootstrap.App()
 	env := appInit.Env
 
-	app := fiber.New(fiber.Config{
-		AppName:      "PIN-POS",
-		BodyLimit:    4 * 1024 * 1024,
-		ReadTimeout:  time.Second * 25,
-		WriteTimeout: time.Second * 25,
-		JSONEncoder:  sonic.Marshal,
-		JSONDecoder:  sonic.Unmarshal,
-	})
+	app := fiber.New(config.FiberConfig(env.AppName))
 
 	app.Use(middleware.NewMiddlewareHandler().Cache())
 	app.Use(middleware.NewMiddlewareHandler().Compress())
