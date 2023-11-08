@@ -21,6 +21,8 @@ func StartServer() {
 
 	app := fiber.New(config.FiberConfig(env.AppName))
 
+	app.Use(middleware.NewMiddlewareHandler().ClientIP())
+	app.Use(middleware.NewMiddlewareHandler().IsFromLocal(env.RunEnv))
 	app.Use(middleware.NewMiddlewareHandler().Cache())
 	app.Use(middleware.NewMiddlewareHandler().Compress())
 	app.Use(middleware.NewMiddlewareHandler().Logger())

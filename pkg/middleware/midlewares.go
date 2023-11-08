@@ -12,6 +12,8 @@ type Middlewares interface {
 	Compress() fiber.Handler
 	Csrf() fiber.Handler
 	Cache() fiber.Handler
+	ClientIP() fiber.Handler
+	IsFromLocalhost(string) fiber.Handler
 }
 
 type middlewaresHandler struct {

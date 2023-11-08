@@ -1,7 +1,6 @@
 package bootstrap
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/spf13/viper"
@@ -29,7 +28,7 @@ type Env struct {
 
 func NewEnv() *Env {
 	env := Env{}
-	// _ = godotenv.Load(".env")
+
 	viper.SetConfigFile(".env")
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatalf("Error loading .env file: %s", err)
@@ -41,23 +40,6 @@ func NewEnv() *Env {
 	if err := viper.Unmarshal(&env); err != nil {
 		log.Fatalf("Unable to decode into struct: %s", err)
 	}
-	fmt.Println(env)
-	// _ = godotenv.Load(".env")
-	// runEnv := os.Getenv("RUN_ENV")
-	// if runEnv == "local" {
-	// 	viper.SetConfigFile(".env")
-	// 	if err := viper.ReadInConfig(); err != nil {
-	// 		log.Fatalf("Error loading .env file: %s", err)
-	// 	}
-	// 	log.Println("The App is running in local env")
-	// } else {
-	// 	log.Println("The App is running in Cloud Run")
-	// }
-
-	// viper.AutomaticEnv()
-	// if err := viper.Unmarshal(&env); err != nil {
-	// 	log.Fatalf("Unable to decode into struct: %s", err)
-	// }
 
 	return &env
 }
